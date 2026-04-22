@@ -1,5 +1,3 @@
-import { buildDisplayInfo } from './exifFormat'
-
 function hexToRgb(hex) {
   const clean = hex.replace('#', '')
   const bigint = parseInt(clean, 16)
@@ -46,8 +44,8 @@ export function drawIcon(ctx, type, x, y, size, color) {
         ctx.beginPath()
         ctx.moveTo(Math.cos(a) * s * 0.14, Math.sin(a) * s * 0.14)
         ctx.lineTo(
-            Math.cos(a + 0.35) * s * 0.34,
-            Math.sin(a + 0.35) * s * 0.34
+          Math.cos(a + 0.35) * s * 0.34,
+          Math.sin(a + 0.35) * s * 0.34
         )
         ctx.stroke()
       }
@@ -159,7 +157,7 @@ export function drawIcon(ctx, type, x, y, size, color) {
   ctx.restore()
 }
 
-export function renderCanvas(canvas, image, exifData, controls) {
+export function renderCanvas(canvas, image, exifData, exifForm, controls) {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
@@ -209,21 +207,6 @@ export function renderCanvas(canvas, image, exifData, controls) {
   ctx.fillRect(0, 0, outputWidth, outputHeight)
   ctx.restore()
 
-  if (controls.vignette > 0) {
-    const rg = ctx.createRadialGradient(
-        outputWidth / 2,
-        outputHeight / 2,
-        Math.min(outputWidth, outputHeight) * 0.2,
-        outputWidth / 2,
-        outputHeight / 2,
-        Math.max(outputWidth, outputHeight) * 0.72
-    )
-    rg.addColorStop(0, 'rgba(0,0,0,0)')
-    rg.addColorStop(1, `rgba(0,0,0,${controls.vignette})`)
-    ctx.fillStyle = rg
-    ctx.fillRect(0, 0, outputWidth, outputHeight)
-  }
-
   const barWidth = outputWidth * (controls.barWidth / 100)
 
   if (barWidth > 0) {
@@ -232,20 +215,18 @@ export function renderCanvas(canvas, image, exifData, controls) {
     const e = hexToRgb(controls.gradEnd)
 
     grad.addColorStop(
-        0,
-        `rgba(${s.r}, ${s.g}, ${s.b}, ${controls.gradStartAlpha ?? 0.68})`
+      0,
+      `rgba(${s.r}, ${s.g}, ${s.b}, ${controls.gradStartAlpha ?? 0.68})`
     )
     grad.addColorStop(
-        0.55,
-        `rgba(${e.r}, ${e.g}, ${e.b}, ${controls.gradEndAlpha ?? 0.22})`
+      0.55,
+      `rgba(${e.r}, ${e.g}, ${e.b}, ${controls.gradEndAlpha ?? 0.22})`
     )
     grad.addColorStop(1, 'rgba(255,255,255,0)')
 
     ctx.fillStyle = grad
     ctx.fillRect(0, 0, barWidth, outputHeight)
   }
-
-  const info = buildDisplayInfo(exifData, controls)
 
   const left = controls.leftPadding ?? 56
   const top = controls.topPadding ?? 86
@@ -272,43 +253,47 @@ export function renderCanvas(canvas, image, exifData, controls) {
   const thinColor = `rgba(255,255,255,${controls.textOpacity * 0.72})`
 
   const topRows = [
-    ['aperture', info.aperture],
-    ['shutter', info.shutter],
-    ['iso', `ISO ${info.iso}`],
-    ['focal', info.focal]
-  ]
+    ['aperture', exifForm?.aperture?.value, exifForm?.aperture?.visible],
+    ['shutter', exifForm?.shutter?.value, exifForm?.shutter?.visible],
+    ['iso', exifForm?.iso?.value ? `ISO ${exifForm.iso.value}` : '--', exifForm?.iso?.visible],
+    ['focal', exifForm?.focal?.value, exifForm?.focal?.visible]
+  ].filter(([, value, visible]) => visible !== false && value && value !== '--')
+
+  const bottomRows = [
+    ['date', exifForm?.date?.value, exifForm?.date?.visible],
+    ['camera', exifForm?.model?.value, exifForm?.model?.visible],
+    ['lens', exifForm?.lens?.value, exifForm?.lens?.visible],
+    ['copyright', exifForm?.copyright?.value, exifForm?.copyright?.visible]
+  ].filter(([, value, visible]) => visible !== false && value && value !== '--')
 
   ctx.fillStyle = textColor
   ctx.textBaseline = 'middle'
   ctx.font = `300 ${controls.primaryFontSize}px Inter, sans-serif`
 
   topRows.forEach((row, i) => {
+    const [icon, text] = row
     const y = top + i * mainGap
-    drawIcon(ctx, row[0], iconX, y, topIconSize, textColor)
-    ctx.fillText(row[1], textX, y + textNudgeY)
+    drawIcon(ctx, icon, iconX, y, topIconSize, textColor)
+    ctx.fillText(text, textX, y + textNudgeY)
   })
 
-  ctx.save()
-  ctx.strokeStyle = thinColor
-  ctx.lineWidth = dividerWidth
-  ctx.beginPath()
-  ctx.moveTo(left, lineY)
-  ctx.lineTo(outputWidth - rightPadding, lineY)
-  ctx.stroke()
-  ctx.restore()
-
-  const bottomRows = [
-    ['date', info.date],
-    ['camera', info.model],
-    ['lens', info.lens],
-    ['copyright', info.copyright]
-  ]
+  if (topRows.length > 0 || bottomRows.length > 0) {
+    ctx.save()
+    ctx.strokeStyle = thinColor
+    ctx.lineWidth = dividerWidth
+    ctx.beginPath()
+    ctx.moveTo(left, lineY)
+    ctx.lineTo(outputWidth - rightPadding, lineY)
+    ctx.stroke()
+    ctx.restore()
+  }
 
   ctx.font = `300 ${controls.secondaryFontSize}px Inter, sans-serif`
 
   bottomRows.forEach((row, i) => {
+    const [icon, text] = row
     const y = lineY + secondGap * (i + bottomStartFactor)
-    drawIcon(ctx, row[0], iconX, y, bottomIconSize, textColor)
-    ctx.fillText(row[1], textX, y + textNudgeY)
+    drawIcon(ctx, icon, iconX, y, bottomIconSize, textColor)
+    ctx.fillText(text, textX, y + textNudgeY)
   })
 }

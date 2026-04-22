@@ -1,7 +1,6 @@
 export const defaultControls = {
   blur: 12,
   overlay: 0.32,
-  vignette: 0.18,
   barWidth: 31,
   textOpacity: 0.94,
   gradStart: '#1f252c',
@@ -18,18 +17,4 @@ export const defaultControls = {
   outputWidth: 1600
 }
 
-export const emptyExif = {
-  FNumber: null,
-  ApertureValue: null,
-  ExposureTime: null,
-  ISOSpeedRatings: null,
-  PhotographicSensitivity: null,
-  FocalLength: null,
-  DateTimeOriginal: null,
-  DateTime: null,
-  Model: null,
-  LensModel: null,
-  LensInfo: null,
-  Artist: null,
-  Copyright: null
-}
+export const emptyExif = {}

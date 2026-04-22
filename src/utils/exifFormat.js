@@ -1,39 +1,49 @@
 export function formatExposureTime(value) {
   if (!value) return '--'
+
   if (typeof value === 'number') {
     if (value >= 1) return `${value}s`
     return `1/${Math.round(1 / value)}`
   }
+
   if (typeof value === 'string') {
     if (value.includes('/')) return value
     const num = Number(value)
     if (!Number.isNaN(num)) return formatExposureTime(num)
   }
-  if (value.numerator && value.denominator) {
+
+  if (value?.numerator && value?.denominator) {
     return value.denominator === 1
-        ? `${value.numerator}s`
-        : `${value.numerator}/${value.denominator}`
+      ? `${value.numerator}s`
+      : `${value.numerator}/${value.denominator}`
   }
+
   return String(value)
 }
 
 export function formatFNumber(value) {
   if (!value) return '--'
+
   if (typeof value === 'number') {
     return `f/${value.toFixed(1).replace('.0', '')}`
   }
-  if (value.numerator && value.denominator) {
+
+  if (value?.numerator && value?.denominator) {
     return `f/${(value.numerator / value.denominator).toFixed(1).replace('.0', '')}`
   }
+
   return `f/${String(value).replace(/^f\/?/i, '')}`
 }
 
 export function formatFocal(value) {
   if (!value) return '--'
+
   if (typeof value === 'number') return `${Math.round(value)}mm`
-  if (value.numerator && value.denominator) {
+
+  if (value?.numerator && value?.denominator) {
     return `${Math.round(value.numerator / value.denominator)}mm`
   }
+
   return String(value).replace(/\.0mm$/, 'mm')
 }
 
@@ -48,7 +58,7 @@ export function formatDate(value, style) {
     const trimmed = value.trim()
 
     const exifMatch = trimmed.match(
-        /^(\d{4})[:\-](\d{2})[:\-](\d{2})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/
+      /^(\d{4})[:\-](\d{2})[:\-](\d{2})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/
     )
 
     if (exifMatch) {
@@ -88,28 +98,13 @@ export function getExifValue(exifData, name, fallbackNames = []) {
   const keys = [name, ...fallbackNames]
   for (const key of keys) {
     if (
-        exifData[key] !== undefined &&
-        exifData[key] !== null &&
-        exifData[key] !== ''
+      exifData &&
+      exifData[key] !== undefined &&
+      exifData[key] !== null &&
+      exifData[key] !== ''
     ) {
       return exifData[key]
     }
   }
   return null
-}
-
-export function buildDisplayInfo(exifData, controls) {
-  return {
-    aperture: formatFNumber(getExifValue(exifData, 'FNumber', ['ApertureValue'])),
-    shutter: formatExposureTime(getExifValue(exifData, 'ExposureTime')),
-    iso: getExifValue(exifData, 'ISO', ['ISOSpeedRatings', 'PhotographicSensitivity', 'iso']) || '--',
-    focal: formatFocal(getExifValue(exifData, 'FocalLength')),
-    date: formatDate(
-        getExifValue(exifData, 'DateTimeOriginal', ['DateTime']),
-        controls.dateFormat
-    ),
-    model: getExifValue(exifData, 'Model') || '--',
-    lens: getExifValue(exifData, 'LensModel') || getExifValue(exifData, 'LensInfo') || '--',
-    copyright: controls.copyrightText.trim() || '© yourname'
-  }
 }
