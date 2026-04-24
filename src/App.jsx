@@ -6,6 +6,9 @@ import Dropzone from './components/Dropzone'
 import { defaultControls, emptyExif } from './utils/defaults'
 import { loadControls, saveControls } from './utils/storage'
 import { buildExifForm } from './utils/exifForm'
+import { QuestionMarkCircledIcon } from '@radix-ui/react-icons'
+import CornerDrawer from './components/CornerDrawer'
+import ChangelogPanel from './components/ChangelogPanel'
 
 export default function App() {
   const initialControlsRef = useRef(loadControls(defaultControls))
@@ -14,6 +17,7 @@ export default function App() {
   const [exifData, setExifData] = useState(emptyExif)
   const [exifForm, setExifForm] = useState(buildExifForm(emptyExif, initialControlsRef.current))
   const [statusText, setStatusText] = useState('尚未加载图片。')
+  const [cornerDrawerOpen, setCornerDrawerOpen] = useState(false)
 
   const summary = useMemo(() => {
     return image ? `已加载图片。${statusText}` : statusText
@@ -141,31 +145,50 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
-      <ControlPanel
-        controls={controls}
-        exifForm={exifForm}
-        onChange={updateControl}
-        onExifFieldChange={updateExifField}
-        onReset={onReset}
-        onDownload={onDownload}
-        onFileChange={onFileChange}
-        onSavePreset={onSavePreset}
-      />
-
-      <main className="workspace">
-        <Dropzone onFileDrop={loadImageFile} />
-        <PreviewCanvas
-          image={image}
-          exifData={exifData}
-          exifForm={exifForm}
-          controls={controls}
+    <>
+      <button
+          type="button"
+          className="global-corner-trigger"
+          aria-label="打开侧边面板"
+          onClick={() => setCornerDrawerOpen(true)}
+      >
+      <span className="global-corner-trigger-inner">
+        <QuestionMarkCircledIcon width="18" height="18" />
+      </span>
+      </button>
+      <div className="app-shell">
+        <ControlPanel
+            controls={controls}
+            exifForm={exifForm}
+            onChange={updateControl}
+            onExifFieldChange={updateExifField}
+            onReset={onReset}
+            onDownload={onDownload}
+            onFileChange={onFileChange}
+            onSavePreset={onSavePreset}
         />
-        <div className="hint note">
-          {summary} 工具功能逐步完善和更新迭代中，如使用发现问题或者有其它更好的需求，请联系作者@harrycraft，作者周末才回复。
-        </div>
-      </main>
 
-    </div>
+        <main className="workspace">
+          <Dropzone onFileDrop={loadImageFile} />
+          <PreviewCanvas
+            image={image}
+            exifData={exifData}
+            exifForm={exifForm}
+            controls={controls}
+          />
+          <div className="hint note">
+            {summary} 工具功能逐步完善和更新迭代中，如使用发现问题或者有其它更好的需求，请联系作者@harrycraft，作者周末才回复。
+          </div>
+        </main>
+
+
+      </div>
+      <CornerDrawer
+          open={cornerDrawerOpen}
+          onOpenChange={setCornerDrawerOpen}
+      >
+        <ChangelogPanel />
+      </CornerDrawer>
+      </>
   )
 }

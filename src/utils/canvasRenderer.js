@@ -145,7 +145,7 @@ export function drawIcon(ctx, type, x, y, size, color) {
       ctx.arc(0, 0, s * 0.28, 0, Math.PI * 2)
       ctx.stroke()
 
-      ctx.font = `${s * 0.5}px Inter, sans-serif`
+      ctx.font = `500 ${s * 0.5}px ${color.fontFamily || 'Inter, sans-serif'}`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillStyle = color
@@ -242,11 +242,13 @@ export function renderCanvas(canvas, image, exifData, exifForm, controls) {
   const iconX = left + iconOffsetX
   const textX = left + textOffsetX
 
-  const topIconSize = Math.max(18, controls.primaryFontSize * 1.15)
-  const bottomIconSize = Math.max(16, controls.secondaryFontSize * 1.15)
+  const fontSize = controls.fontSize ?? 32
+  const fontWeight = controls.fontWeight ?? 300
+  const iconSize = Math.max(18, fontSize * 1.15)
 
-  const mainGap = controls.primaryFontSize * controls.lineHeight
-  const secondGap = controls.secondaryFontSize * controls.lineHeight
+  const mainGap = fontSize * controls.lineHeight
+  const secondGap = fontSize * controls.lineHeight
+
   const lineY = top + mainGap * dividerGapFactor
 
   const textColor = `rgba(255,255,255,${controls.textOpacity})`
@@ -266,14 +268,23 @@ export function renderCanvas(canvas, image, exifData, exifForm, controls) {
     ['copyright', exifForm?.copyright?.value, exifForm?.copyright?.visible]
   ].filter(([, value, visible]) => visible !== false && value && value !== '--')
 
+  function buildCanvasFont(weight, size, family) {
+    const safeFamily = family || 'Inter, sans-serif'
+    return `${weight} ${size}px ${safeFamily}`
+  }
+
   ctx.fillStyle = textColor
   ctx.textBaseline = 'middle'
-  ctx.font = `300 ${controls.primaryFontSize}px Inter, sans-serif`
+  ctx.font = buildCanvasFont(
+      fontWeight,
+      fontSize,
+      controls.fontFamily
+  )
 
   topRows.forEach((row, i) => {
     const [icon, text] = row
     const y = top + i * mainGap
-    drawIcon(ctx, icon, iconX, y, topIconSize, textColor)
+    drawIcon(ctx, icon, iconX, y, iconSize, textColor)
     ctx.fillText(text, textX, y + textNudgeY)
   })
 
@@ -288,12 +299,16 @@ export function renderCanvas(canvas, image, exifData, exifForm, controls) {
     ctx.restore()
   }
 
-  ctx.font = `300 ${controls.secondaryFontSize}px Inter, sans-serif`
+  ctx.font = buildCanvasFont(
+      fontWeight,
+      fontSize,
+      controls.fontFamily
+  )
 
   bottomRows.forEach((row, i) => {
     const [icon, text] = row
     const y = lineY + secondGap * (i + bottomStartFactor)
-    drawIcon(ctx, icon, iconX, y, bottomIconSize, textColor)
+    drawIcon(ctx, icon, iconX, y, iconSize, textColor)
     ctx.fillText(text, textX, y + textNudgeY)
   })
 }

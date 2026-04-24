@@ -215,32 +215,58 @@ export default function ControlPanel({
               onChange={(e) => onChange('outputWidth', Number(e.target.value))}
             />
 
-            <RangeField
-              label="上半区字体大小"
-              value={controls.primaryFontSize}
-              min="18"
+
+            <select
+                value={controls.fontFamily}
+                onChange={(e) => onChange('fontFamily', e.target.value)}
+                style={{
+                  width: '100%',
+                  height: 40,
+                  borderRadius: 10,
+                  padding: '0 12px',
+                  border: '1px solid var(--gray-6)',
+                  background: 'var(--color-panel-solid)',
+                  color: 'inherit'
+                }}
+            >
+              <option value="Inter, sans-serif">Inter</option>
+              <option value="system-ui, sans-serif">System UI</option>
+              <option value="Arial, sans-serif">Arial</option>
+              <option value="'PingFang SC', 'Microsoft YaHei', sans-serif">苹方 / 微软雅黑</option>
+              <option value="'Helvetica Neue', Arial, sans-serif">Helvetica Neue</option>
+              <option value="Georgia, serif">Georgia</option>
+            </select>
+
+          <RangeField
+              label="字体大小"
+              value={controls.fontSize}
+              min="16"
               max="72"
               step="1"
               suffix=" px"
-              onChange={(e) => onChange('primaryFontSize', Number(e.target.value))}
-            />
-            <RangeField
-              label="下半区字体大小"
-              value={controls.secondaryFontSize}
-              min="16"
-              max="64"
-              step="1"
-              suffix=" px"
-              onChange={(e) => onChange('secondaryFontSize', Number(e.target.value))}
-            />
-            <RangeField
+              onChange={(e) => onChange('fontSize', Number(e.target.value))}
+          />
+
+          <RangeField
+              label="字体粗细"
+              value={controls.fontWeight}
+              min="100"
+              max="900"
+              step="100"
+              onChange={(e) => onChange('fontWeight', Number(e.target.value))}
+          />
+
+          <RangeField
               label="文字行间距"
               value={controls.lineHeight.toFixed(2)}
               min="0.9"
               max="2.2"
               step="0.01"
               onChange={(e) => onChange('lineHeight', Number(e.target.value))}
-            />
+          />
+
+
+
 
             <TextFieldRow
               label="版权署名"

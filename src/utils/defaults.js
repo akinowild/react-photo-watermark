@@ -9,12 +9,14 @@ export const defaultControls = {
   gradEndAlpha: 0.22,
   copyrightText: '© yourname',
   dateFormat: 'dot',
-  primaryFontSize: 34,
-  secondaryFontSize: 28,
+  fontSize: 32,
+  fontWeight: 300,
+  fontFamily: 'Inter',
   lineHeight: 1.32,
   leftPadding: 56,
   topPadding: 86,
   outputWidth: 1600
 }
+
 
 export const emptyExif = {}
