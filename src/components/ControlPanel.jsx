@@ -139,7 +139,7 @@ export default function ControlPanel({
               label="信息栏宽度"
               value={controls.barWidth}
               min="0"
-              max="100"
+              max="200"
               step="1"
               suffix=" %"
               onChange={(e) => onChange('barWidth', Number(e.target.value))}
@@ -205,15 +205,15 @@ export default function ControlPanel({
               onChange={(e) => onChange('topPadding', Number(e.target.value))}
             />
 
-            <RangeField
-              label="输出宽度"
-              value={controls.outputWidth}
-              min="800"
-              max="3200"
-              step="100"
-              suffix=" px"
-              onChange={(e) => onChange('outputWidth', Number(e.target.value))}
-            />
+            {/*<RangeField*/}
+            {/*  label="输出宽度"*/}
+            {/*  value={controls.outputWidth}*/}
+            {/*  min="800"*/}
+            {/*  max="3200"*/}
+            {/*  step="100"*/}
+            {/*  suffix=" px"*/}
+            {/*  onChange={(e) => onChange('outputWidth', Number(e.target.value))}*/}
+            {/*/>*/}
 
 
             <select
@@ -240,8 +240,8 @@ export default function ControlPanel({
           <RangeField
               label="字体大小"
               value={controls.fontSize}
-              min="16"
-              max="72"
+              min="40"
+              max="100"
               step="1"
               suffix=" px"
               onChange={(e) => onChange('fontSize', Number(e.target.value))}
